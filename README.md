@@ -1,7 +1,7 @@
 # Deployment Scripts
 
 ## Requirements
-- Linux
+- \*nix system
 - Git
 - NodeJS
 - PM2
