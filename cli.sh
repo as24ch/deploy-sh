@@ -9,7 +9,7 @@ source $dir/src/config.sh
 source $dir/src/functions.sh
 source $dir/src/read_args.sh
 
-propmt_config --skip
+prompt_config --skip
 
 if [ "$is_confirmed" == "" ]
   then

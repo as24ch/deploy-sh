@@ -2,17 +2,24 @@
 
 dir="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 source $dir/src/functions.sh
+source $dir/src/read_args.sh
 
 echo "
 Hi there!
 This script is going to prefrom a clean setup of deployments scripts for NodeJS applications on this machine.
 
-Do you wan to continue?
 "
+if [ "$is_confirmed" != "true" ]
+  then
+    echo "
+    Do you wan to continue?
+    "
+    confirm
+    prompt_config
+  else
+    prompt_config --skip
+fi
 
-confirm
-
-propmt_config
 write_config
 
 pm2 kill

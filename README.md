@@ -1,5 +1,11 @@
 # Deployment Scripts
 
+## Requirements
+- Linux
+- Git
+- NodeJS
+- PM2
+
 ## Instalation:
 
 ```bash
@@ -38,8 +44,8 @@ Flags:
 ### Config
 ```
 GITHUB_TOKEN      - Github token with repository read access
-GITHUB_REPOSITORY - Github source code repository
-GIT_CHECKOUT      - Git branch or tag with required code snapshot
+GITHUB_REPOSITORY - Github source code repository in format {user_name}/{repo_name}
+GIT_CHECKOUT      - Git branch or tag (supports "latest") with required code snapshot
 SERVER_ENV        - Server environment. Usually one of: test, integration, staging, production
 DEPLOY_DIR        - Location of the source file on server
 WEBHOK_URL        - URL used for notifications during deployment process (Optional)
