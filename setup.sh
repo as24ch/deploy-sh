@@ -7,12 +7,10 @@ source $dir/src/read_args.sh
 echo "
 Hi there!
 This script is going to prefrom a clean setup of deployments scripts for NodeJS applications on this machine.
-
 "
 if [ "$is_confirmed" != "true" ]
   then
-    echo "
-    Do you wan to continue?
+    echo "Do you wan to continue?
     "
     confirm
     prompt_config
