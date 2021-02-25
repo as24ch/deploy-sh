@@ -29,9 +29,9 @@ chmod +x $dir/rollout.sh
 chmod +x $dir/start.sh
 chmod +x $dir/rollback.sh
 
-sudo rm -rf $DEPLOY_DIR
-sudo mkdir $DEPLOY_DIR
-sudo chmod a+rwx $DEPLOY_DIR
+rm -rf $DEPLOY_DIR
+mkdir $DEPLOY_DIR
+chmod a+rwx $DEPLOY_DIR
 
 mkdir $DEPLOY_DIR/next
 mkdir $DEPLOY_DIR/app
