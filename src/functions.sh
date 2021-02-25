@@ -132,5 +132,5 @@ print_help () {
 }
 
 notify_webhook () {
-  echo "$WEBHOOK_URL?server=$(hostname)&repo=$GITHUB_REPO&env=$SERVER_ENV&checkout=$GIT_CHECKOUT&step=$1"
+  echo "$WEBHOOK_URL?server=$(hostname)&repo=$GITHUB_REPOSITORY&env=$SERVER_ENV&checkout=$GIT_CHECKOUT&step=$1"
 }
