@@ -132,9 +132,11 @@ setup.sh    - Clean setup of deployment scripts.
 }
 
 log () {
-  echo "***
+  echo "
+***
 *** $1
-***"
+***
+"
 }
 
 notify () {
