@@ -14,13 +14,11 @@ fi
 
 ########################
 
-notify_webhook "rollback:run"
+notify rollback start
 
 cd $DEPLOY_DIR
 
 mv ./next ./del
-
-notify_webhook "rollback:kill"
 
 pm2 kill
 
@@ -34,6 +32,6 @@ rm -rf ./del
 
 mkdir ./prev
 
-notify_webhook "rollback:done"
+notify rollback done
 
 exit 0

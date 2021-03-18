@@ -31,7 +31,7 @@ checkout - Overrides GIT_CHECKOUT.
 env      - Overrides SERVER_ENV.
 dir      - Overrides DEPLOY_DIR.
            (folder provided must have respective access permitions)
-webhook  - Overrides WEBHOOK_URL.
+webhook  - Overrides WEBHOOK.
 action   - Sets action to one of: deploy (default), prepare, rollout, start, rollback.
            Using this argument will have same effect as executing respective *.sh file.
 
@@ -50,7 +50,7 @@ GITHUB_REPOSITORY - Github source code repository in format {user_name}/{repo_na
 GIT_CHECKOUT      - Git branch or tag (supports "latest") with required code snapshot.
 SERVER_ENV        - Server environment. Usually one of: test, integration, staging, production.
 DEPLOY_DIR        - Location of the source file on server.
-WEBHOK_URL        - (optional) URL used for notifications during deployment process.
+WEBHOOK           - (optional) URL used for notifications during deployment process.
 ```
 
 ### Files

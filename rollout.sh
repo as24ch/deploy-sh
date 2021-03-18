@@ -14,13 +14,11 @@ fi
 
 ########################
 
-notify_webhook "rollout:run"
+notify rollout start
 
 cd $DEPLOY_DIR
 
 mv ./prev ./del
-
-notify_webhook "rollout:kill"
 
 pm2 kill
 
@@ -28,14 +26,12 @@ mv ./app ./prev
 
 mv ./next ./app
 
-echo "ROLLOUT $dir"
-
 $dir/start.sh --slave
 
 rm -rf ./del
 
 mkdir ./next
 
-notify_webhook "rollout:done"
+notify rollout done
 
 exit 0

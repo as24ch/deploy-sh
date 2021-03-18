@@ -11,42 +11,39 @@ source $dir/src/read_args.sh
 
 prompt_config --skip
 
-if [ "$is_confirmed" == "" ]
+if [ "$should_save_config" == "true" ]
   then
-    echo "
-Will execute \"$action\" action with following configuration:"
+    write_config
+    log "config saved"
+fi
+
+if [ "$is_confirmed" != "true" ]
+  then
+    echo "Will execute \"$action\" action with following configuration:"
     print_config
     confirm
 fi
 
-notify_webhook "deploy:run"
+notify deploy start
 
-if [ "$action" == "prepare" ]
-  then
+case "$action" in
+  prepare)
     $dir/prepare.sh --slave
-fi
-
-if [ "$action" == "rollout" ]
-  then
+    ;;
+  rollout)
     $dir/rollout.sh --slave
-fi
-
-if [ "$action" == "start" ]
-  then
+    ;;
+  start)
     $dir/start.sh --slave
-fi
-
-if [ "$action" == "deploy" ]
-  then
+    ;;
+  deploy)
     $dir/prepare.sh --slave
     $dir/rollout.sh --slave
-fi
-
-if [ "$action" == "rollback" ]
-  then
+    ;;
+  rollback)
     $dir/rollback.sh --slave
-fi
+    ;;
+esac
 
-notify_webhook "deploy:done"
-
+notify deploy done
 exit 0
