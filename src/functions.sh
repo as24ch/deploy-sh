@@ -1,3 +1,23 @@
+log () {
+  echo "
+***
+*** $1
+***
+"
+}
+
+getRepoUrl () {
+  echo "https://$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+}
+
+getLatestTag () {
+  echo $(git ls-remote --tags --refs --sort="v:refname" $(getRepoUrl) | tail -n1 | sed 's/.*\///')
+}
+
+getCurrentCheckout () {
+  echo $(git -C $DEPLOY_DIR/app symbolic-ref -q --short HEAD || git -C $DEPLOY_DIR/app describe --tags --exact-match)
+}
+
 prompt () {
   if [ "$1" == "" ]
     then
@@ -42,6 +62,7 @@ prompt_config () {
   prompt GIT_CHECKOUT $1
   prompt SERVER_ENV $1
   prompt DEPLOY_DIR $1
+  prompt WEBHOOK $1 --optional
   prompt WEBHOOK_URL $1 --optional
 }
 
@@ -51,7 +72,7 @@ export GITHUB_REPOSITORY=\"$GITHUB_REPOSITORY\"
 export GIT_CHECKOUT=\"$GIT_CHECKOUT\"
 export SERVER_ENV=\"$SERVER_ENV\"
 export DEPLOY_DIR=\"$DEPLOY_DIR\"
-export WEBHOOK_URL=\"$WEBHOOK_URL\"
+export WEBHOOK=\"$WEBHOOK\"
 " > $(dirname $BASH_SOURCE[0])/config.sh
 }
 
@@ -72,12 +93,12 @@ print_config () {
   echo "
 Current deployment configuration:
 
-GITHUB_TOKEN      = $GITHUB_TOKEN
-GITHUB_REPOSITORY = $GITHUB_REPOSITORY
-GIT_CHECKOUT      = $GIT_CHECKOUT
-SERVER_ENV        = $SERVER_ENV
-DEPLOY_DIR        = $DEPLOY_DIR
-WEBHOOK_URL       = $WEBHOOK_URL
+GITHUB_TOKEN             = $GITHUB_TOKEN
+GITHUB_REPOSITORY        = $GITHUB_REPOSITORY
+GIT_CHECKOUT             = $GIT_CHECKOUT
+SERVER_ENV               = $SERVER_ENV
+DEPLOY_DIR               = $DEPLOY_DIR
+WEBHOOK                  = $WEBHOOK
 "
 }
 
@@ -97,7 +118,7 @@ checkout - Overrides GIT_CHECKOUT.
 env      - Overrides SERVER_ENV.
 dir      - Overrides DEPLOY_DIR.
            (folder provided must have respective access permitions)
-webhook  - Overrides WEBHOOK_URL.
+webhook  - Overrides WEBHOOK.
 action   - Sets action to one of: deploy (default), prepare, rollout, start, rollback.
            Using this argument will have same effect as executing respective *.sh file.
 
@@ -116,7 +137,7 @@ GITHUB_REPOSITORY - Github source code repository in format {user_name}/{repo_na
 GIT_CHECKOUT      - Git branch or tag (supports \"latest\") with required code snapshot.
 SERVER_ENV        - Server environment. Usually one of: test, integration, staging, production.
 DEPLOY_DIR        - Location of the source file on server.
-WEBHOK_URL        - (optional) URL used for notifications during deployment process.
+WEBHOOK           - (optional) URL used for notifications during deployment process.
 
 - Files -
 
@@ -131,19 +152,27 @@ setup.sh    - Clean setup of deployment scripts.
 "
 }
 
-log () {
-  echo "
-***
-*** $1
-***
-"
+post () {
+  local url="$1"
+  local data="$2"
+
+  curl -H "Content-Type: application/json" --data "$data" $url
 }
 
 notify () {
-  log "[$2] $1"
+  local action="$1"
+  local status="$2"
+  local data="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
 
-  if [ "$WEBHOOK_URL" != "" ]
+  log "[$status] $action"
+
+  if [ "$WEBHOOK" != "" ]
     then
-      curl "$WEBHOOK_URL?server=$(hostname)&repo=$GITHUB_REPOSITORY&env=$SERVER_ENV&checkout=$GIT_CHECKOUT&action=$1&status=$2"
+      post $WEBHOOK $data
+  fi
+
+  if [[ "$WEBHOOK_SLACK_DEPLOYMENT" != "" && "$action" == "deploy" && "$status" == "done" ]]
+    then
+      post $WEBHOOK_SLACK_DEPLOYMENT $data
   fi
 }

@@ -26,32 +26,24 @@ fi
 
 notify deploy start
 
-if [ "$action" == "prepare" ]
-  then
+case "$action" in
+  prepare)
     $dir/prepare.sh --slave
-fi
-
-if [ "$action" == "rollout" ]
-  then
+    ;;
+  rollout)
     $dir/rollout.sh --slave
-fi
-
-if [ "$action" == "start" ]
-  then
+    ;;
+  start)
     $dir/start.sh --slave
-fi
-
-if [ "$action" == "deploy" ]
-  then
+    ;;
+  deploy)
     $dir/prepare.sh --slave
     $dir/rollout.sh --slave
-fi
-
-if [ "$action" == "rollback" ]
-  then
+    ;;
+  rollback)
     $dir/rollback.sh --slave
-fi
+    ;;
+esac
 
 notify deploy done
-
 exit 0

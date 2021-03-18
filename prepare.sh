@@ -14,6 +14,8 @@ if [ "$1" != "--slave" ]
     prompt GIT_CHECKOUT --skip
 fi
 
+[[ "$GIT_CHECKOUT" == "latest" ]] && export GIT_CHECKOUT=$(getLatestTag)
+
 ########################
 
 notify prepare start
@@ -22,13 +24,11 @@ cd $DEPLOY_DIR
 
 rm -rf ./next
 
-git clone https://$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git $DEPLOY_DIR/next
+git clone $(getRepoUrl) $DEPLOY_DIR/next
 
 cd ./next
 
 git fetch --all --tags --prune
-
-[[ "$GIT_CHECKOUT" == "latest" ]] && GIT_CHECKOUT=$(git describe --tags `git rev-list --tags --max-count=1`)
 
 git checkout $GIT_CHECKOUT
 

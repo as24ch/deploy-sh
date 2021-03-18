@@ -10,7 +10,10 @@ if [ "$1" != "--slave" ]
 
     prompt DEPLOY_DIR --skip
     prompt SERVER_ENV --skip
+
 fi
+
+export GIT_CHECKOUT=$(getCurrentCheckout)
 
 ########################
 
