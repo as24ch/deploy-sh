@@ -16,20 +16,11 @@ fi
 
 ########################
 
-notify_webhook "prepare:run"
-
-echo "
-
-**********************************
-* Preparing $GITHUB_REPOSITORY@$GIT_CHECKOUT *
-**********************************
-"
+notify prepare start
 
 cd $DEPLOY_DIR
 
 rm -rf ./next
-
-notify_webhook "prepare:clone"
 
 git clone https://$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git $DEPLOY_DIR/next
 
@@ -41,24 +32,12 @@ git fetch --all --tags --prune
 
 git checkout $GIT_CHECKOUT
 
-notify_webhook "prepare:deps"
-
 npm install
-
-notify_webhook "prepare:build"
 
 npm run build
 
-notify_webhook "prepare:cleanup"
-
 npm prune --production
 
-echo "
-*********************************
-* Prepared $GITHUB_REPOSITORY@$GIT_CHECKOUT *
-*********************************
-"
-
-notify_webhook "prepare:done"
+notify prepare done
 
 exit 0

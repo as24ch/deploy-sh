@@ -8,10 +8,10 @@ echo "
 Hi there!
 This script is going to prefrom a clean setup of deployments scripts for NodeJS applications on this machine.
 "
+
 if [ "$is_confirmed" != "true" ]
   then
-    echo "Do you wan to continue?
-    "
+    echo "Do you wan to continue?"
     confirm
     prompt_config
   else
@@ -29,7 +29,7 @@ chmod +x $dir/rollback.sh
 
 rm -rf $DEPLOY_DIR/next
 rm -rf $DEPLOY_DIR/app
-rm -rf $DEPLOY_DIR/prev 
+rm -rf $DEPLOY_DIR/prev
 rm -rf $DEPLOY_DIR/logs
 
 mkdir $DEPLOY_DIR/next
@@ -37,9 +37,4 @@ mkdir $DEPLOY_DIR/app
 mkdir $DEPLOY_DIR/prev
 mkdir $DEPLOY_DIR/logs
 
-echo "
-
-All done.
-Happy coding!
-  
-"
+log "All set! Happy coding!"

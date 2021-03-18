@@ -14,7 +14,7 @@ fi
 
 ########################
 
-notify_webhook "start:run"
+notify start start
 
 cd $DEPLOY_DIR/app
 
@@ -22,10 +22,8 @@ pm2 kill
 
 sleep 1
 
-notify_webhook "start:launch"
-
 pm2 start ./ecosystem.json --env $SERVER_ENV
 
-notify_webhook "start:done"
+notify start done
 
 exit 0

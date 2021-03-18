@@ -11,15 +11,20 @@ source $dir/src/read_args.sh
 
 prompt_config --skip
 
-if [ "$is_confirmed" == "" ]
+if [ "$should_save_config" == "true" ]
   then
-    echo "
-Will execute \"$action\" action with following configuration:"
+    write_config
+    log "config saved"
+fi
+
+if [ "$is_confirmed" != "true" ]
+  then
+    echo "Will execute \"$action\" action with following configuration:"
     print_config
     confirm
 fi
 
-notify_webhook "deploy:run"
+notify deploy start
 
 if [ "$action" == "prepare" ]
   then
@@ -47,6 +52,6 @@ if [ "$action" == "rollback" ]
     $dir/rollback.sh --slave
 fi
 
-notify_webhook "deploy:done"
+notify deploy done
 
 exit 0
