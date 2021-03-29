@@ -63,7 +63,8 @@ prompt_config () {
   prompt SERVER_ENV $1
   prompt DEPLOY_DIR $1
   prompt WEBHOOK $1 --optional
-  prompt WEBHOOK_URL $1 --optional
+  prompt WEBHOOK_DEPLOYED $1 --optional
+  prompt WEBHOOK_RELEASED $1 --optional
 }
 
 write_config () {
@@ -73,6 +74,8 @@ export GIT_CHECKOUT=\"$GIT_CHECKOUT\"
 export SERVER_ENV=\"$SERVER_ENV\"
 export DEPLOY_DIR=\"$DEPLOY_DIR\"
 export WEBHOOK=\"$WEBHOOK\"
+export WEBHOOK_RELEASED=\"$WEBHOOK_RELEASED\"
+export WEBHOOK_DEPLOYED=\"$WEBHOOK_DEPLOYED\"
 " > $(dirname $BASH_SOURCE[0])/config.sh
 }
 
@@ -93,12 +96,14 @@ print_config () {
   echo "
 Current deployment configuration:
 
-GITHUB_TOKEN             = $GITHUB_TOKEN
-GITHUB_REPOSITORY        = $GITHUB_REPOSITORY
-GIT_CHECKOUT             = $GIT_CHECKOUT
-SERVER_ENV               = $SERVER_ENV
-DEPLOY_DIR               = $DEPLOY_DIR
-WEBHOOK                  = $WEBHOOK
+DEPLOY_DIR        = $DEPLOY_DIR
+SERVER_ENV        = $SERVER_ENV
+GIT_CHECKOUT      = $GIT_CHECKOUT
+GITHUB_TOKEN      = $GITHUB_TOKEN
+GITHUB_REPOSITORY = $GITHUB_REPOSITORY
+WEBHOOK           = $WEBHOOK
+WEBHOOK_DEPLOYED  = $WEBHOOK_DEPLOYED
+WEBHOOK_RELEASED  = $WEBHOOK_RELEASED
 "
 }
 
@@ -112,21 +117,24 @@ Usage: {script_name}.sh [arg=val...] [--flag]
 
 Arguments (used to override existing configuration):
 
-token    - Overrides GITHUB_TOKEN.
-repo     - Overrides GITHUB_REPOSITORY.
-checkout - Overrides GIT_CHECKOUT.
-env      - Overrides SERVER_ENV.
-dir      - Overrides DEPLOY_DIR.
-           (folder provided must have respective access permitions)
-webhook  - Overrides WEBHOOK.
-action   - Sets action to one of: deploy (default), prepare, rollout, start, rollback.
-           Using this argument will have same effect as executing respective *.sh file.
+a|action           - Sets action to one of: deploy (default), prepare, rollout, start, rollback.
+                     Using this argument will have same effect as executing respective *.sh file.
+c|checkout         - Overrides GIT_CHECKOUT.
+d|dir              - Overrides DEPLOY_DIR.
+e|env              - Overrides SERVER_ENV.
+r|repo             - Overrides GITHUB_REPOSITORY.
+t|token            - Overrides GITHUB_TOKEN.
+                     (folder provided must have respective access permitions)
+w|webhook          - Overrides WEBHOOK.
+wd|webhook-deploy  - Overrides WEBHOOK_DEPLOYED
+wr|webhook-release - Overrides WEBHOOK_RELEASED
+
 
 Flags:
 
 --y      - Forces confirmation prompts.
---info   - Prints current configuration.
 --help   - Prints help.
+--info   - Prints current configuration.
 --save   - Saves provided configuration.
 --config - Starts interactive configuration update.
 
@@ -138,6 +146,8 @@ GIT_CHECKOUT      - Git branch or tag (supports \"latest\") with required code s
 SERVER_ENV        - Server environment. Usually one of: test, integration, staging, production.
 DEPLOY_DIR        - Location of the source file on server.
 WEBHOOK           - (optional) URL used for notifications during deployment process.
+WEBHOOK_DEPLOYED  - (optional) URL used for slack notifications about finished deployments.
+WEBHOOK_RELEASED  - (optional) URL used for release service.
 
 - Files -
 
@@ -162,17 +172,20 @@ post () {
 notify () {
   local action="$1"
   local status="$2"
-  local data="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
+  local deployedData="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
+  local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":true}"
 
   log "[$status] $action"
 
-  if [ "$WEBHOOK" != "" ]
+  [[ "$WEBHOOK" != "" ]] && post $WEBHOOK $data
+
+  if [[ "$WEBHOOK_DEPLOYED" != "" && "$action" == "deploy" && "$status" == "done" ]]
     then
-      post $WEBHOOK $data
+      post $WEBHOOK_DEPLOYED $deployedData
   fi
 
-  if [[ "$WEBHOOK_SLACK_DEPLOYMENT" != "" && "$action" == "deploy" && "$status" == "done" ]]
+  if [[ "$WEBHOOK_RELEASED" != "" && "$action" == "deploy" && "$status" == "done" ]]
     then
-      post $WEBHOOK_SLACK_DEPLOYMENT $data
+      post $WEBHOOK_RELEASED $releaseData
   fi
 }
