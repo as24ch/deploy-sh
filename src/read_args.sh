@@ -28,7 +28,7 @@ for param in "$@"
       wd|webhook-deployed)
         [[ "$value" != "" ]] && export WEBHOOK_DEPLOYED="$value"
         shift;;
-      wd|webhook-released)
+      wr|webhook-released)
         [[ "$value" != "" ]] && export WEBHOOK_RELEASED="$value"
         shift;;
       --y)
