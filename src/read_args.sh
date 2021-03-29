@@ -43,6 +43,9 @@ for param in "$@"
       --save)
         should_save_config="true"
         shift;;
+      --clean)
+        is_clean="true"
+        shift;;
       --config)
         propmt_config
         write_config

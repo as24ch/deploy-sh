@@ -136,6 +136,7 @@ Flags:
 --help   - Prints help.
 --info   - Prints current configuration.
 --save   - Saves provided configuration.
+--clean  - Does cleanup of DEPLOY_DIR during setup process.
 --config - Starts interactive configuration update.
 
 - Config -

@@ -27,14 +27,17 @@ chmod +x $dir/rollout.sh
 chmod +x $dir/start.sh
 chmod +x $dir/rollback.sh
 
-rm -rf $DEPLOY_DIR/next
-rm -rf $DEPLOY_DIR/app
-rm -rf $DEPLOY_DIR/prev
-rm -rf $DEPLOY_DIR/logs
+if [ "$is_clean" == "true" ]
+  then
+    rm -rf $DEPLOY_DIR/next
+    rm -rf $DEPLOY_DIR/app
+    rm -rf $DEPLOY_DIR/prev
+    rm -rf $DEPLOY_DIR/logs
 
-mkdir $DEPLOY_DIR/next
-mkdir $DEPLOY_DIR/app
-mkdir $DEPLOY_DIR/prev
-mkdir $DEPLOY_DIR/logs
+    mkdir $DEPLOY_DIR/next
+    mkdir $DEPLOY_DIR/app
+    mkdir $DEPLOY_DIR/prev
+    mkdir $DEPLOY_DIR/logs
+fi
 
 log "All set! Happy coding!"
