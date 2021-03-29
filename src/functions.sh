@@ -172,20 +172,18 @@ post () {
 notify () {
   local action="$1"
   local status="$2"
+
   local deployedData="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
-  local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":true}"
+
+  local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":true,\"description\":\"Application deployed @$(hostname)\"}"
 
   log "[$status] $action"
 
   [[ "$WEBHOOK" != "" ]] && post $WEBHOOK $data
 
-  if [[ "$WEBHOOK_DEPLOYED" != "" && "$action" == "deploy" && "$status" == "done" ]]
+  if [[ "$action" == "deploy" && "$status" == "done" ]]
     then
-      post $WEBHOOK_DEPLOYED $deployedData
-  fi
-
-  if [[ "$WEBHOOK_RELEASED" != "" && "$action" == "deploy" && "$status" == "done" ]]
-    then
-      post $WEBHOOK_RELEASED $releaseData
+      [[ "$WEBHOOK_DEPLOYED" != "" ]] && post $WEBHOOK_DEPLOYED $deployedData
+      [[ "$WEBHOOK_RELEASED" != "" ]] && post $WEBHOOK_RELEASED $releaseData
   fi
 }
