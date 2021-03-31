@@ -185,22 +185,10 @@ notify () {
 
   if [[ "$action" == "deploy" && "$status" == "done" ]]
     then
-      if [ "$WEBHOOK_SHIPPED" != "" ]
-        then
-          local shippedData="{\"sender\":\"$(hostname)\",\"appVersion\":\"$(getCurrentCheckout)\",\"appName\":\"$GITHUB_REPOSITORY\",\"apiVersion\":\"$(node -p "require('$DEPLOY_DIR/app/ecosystem.json').apps[0].env.API_VERSION || 'n/a'")\"}"
-          post $WEBHOOK_SHIPPED $shippedData
-      fi
+      [[ "$WEBHOOK_SHIPPED" != "" ]] && post $WEBHOOK_SHIPPED "{\"sender\":\"$(hostname)\",\"appVersion\":\"$(getCurrentCheckout)\",\"appName\":\"$GITHUB_REPOSITORY\",\"apiVersion\":\"$(node -p "require('$DEPLOY_DIR/app/ecosystem.json').apps[0].env.API_VERSION || 'n/a'")\"}"
 
-      if [ "$WEBHOOK_DEPLOYED" != "" ]
-        then
-          local deployedData="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
-          post $WEBHOOK_DEPLOYED $deployedData
-      fi
+      [[ "$WEBHOOK_DEPLOYED" != "" ]] && post $WEBHOOK_DEPLOYED "{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
 
-      if [ "$WEBHOOK_RELEASED" != "" ]
-        then
-          local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":false}"
-          post $WEBHOOK_RELEASED $releaseData
-      fi
+      [[ "$WEBHOOK_RELEASED" != "" ]] && post $WEBHOOK_RELEASED "{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":false}"
   fi
 }
