@@ -179,21 +179,28 @@ notify () {
   local action="$1"
   local status="$2"
 
-  local deployedData="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
-
-  local shippedData="{\"sender\":\"$(hostname)\",\"appVersion\":\"$(getCurrentCheckout)\",\"appName\":\"$GITHUB_REPOSITORY\",\"apiVersion\":\"$(node -p "require('$DEPLOY_DIR/app/ecosystem.json').apps[0].env.API_VERSION || 'n/a'")\"}"
-
-  local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":false}"
-
-
   log "[$status] $action"
 
   [[ "$WEBHOOK" != "" ]] && post $WEBHOOK $data
 
   if [[ "$action" == "deploy" && "$status" == "done" ]]
     then
-      [[ "$WEBHOOK_SHIPPED" != "" ]] && post $WEBHOOK_SHIPPED $shippedData
-      [[ "$WEBHOOK_DEPLOYED" != "" ]] && post $WEBHOOK_DEPLOYED $deployedData
-      [[ "$WEBHOOK_RELEASED" != "" ]] && post $WEBHOOK_RELEASED $releaseData
+      if [ "$WEBHOOK_SHIPPED" != "" ]
+        then
+          local shippedData="{\"sender\":\"$(hostname)\",\"appVersion\":\"$(getCurrentCheckout)\",\"appName\":\"$GITHUB_REPOSITORY\",\"apiVersion\":\"$(node -p "require('$DEPLOY_DIR/app/ecosystem.json').apps[0].env.API_VERSION || 'n/a'")\"}"
+          post $WEBHOOK_SHIPPED $shippedData
+      fi
+
+      if [ "$WEBHOOK_DEPLOYED" != "" ]
+        then
+          local deployedData="{\"env\":\"$SERVER_ENV\",\"server\":\"$(hostname)\",\"checkout\":\"$(getCurrentCheckout)\",\"repository\":\"$GITHUB_REPOSITORY\",\"action\":\"$action\",\"status\":\"$status\"}"
+          post $WEBHOOK_DEPLOYED $deployedData
+      fi
+
+      if [ "$WEBHOOK_RELEASED" != "" ]
+        then
+          local releaseData="{\"applicationName\":\"$GITHUB_REPOSITORY\",\"version\":\"$(getCurrentCheckout)\",\"topic\":\"frontend\",\"releaseDate\":\"$(date --iso-8601=seconds)\",\"sendSlackMessage\":false}"
+          post $WEBHOOK_RELEASED $releaseData
+      fi
   fi
 }
