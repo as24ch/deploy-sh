@@ -20,21 +20,21 @@ fi
 
 write_config
 
-pm2 kill
+pm2 kill > /dev/null 2>&1
 
 chmod +x $dir/prepare.sh
 chmod +x $dir/rollout.sh
 chmod +x $dir/start.sh
 chmod +x $dir/rollback.sh
 
-rm -rf $DEPLOY_DIR/next
-rm -rf $DEPLOY_DIR/app
-rm -rf $DEPLOY_DIR/prev
-rm -rf $DEPLOY_DIR/logs
+rm -rf $DEPLOY_DIR/next > /dev/null 2>&1
+rm -rf $DEPLOY_DIR/app > /dev/null 2>&1
+rm -rf $DEPLOY_DIR/prev > /dev/null 2>&1
+rm -rf $DEPLOY_DIR/logs > /dev/null 2>&1
 
-mkdir $DEPLOY_DIR/next
-mkdir $DEPLOY_DIR/app
-mkdir $DEPLOY_DIR/prev
-mkdir $DEPLOY_DIR/logs
+mkdir -p $DEPLOY_DIR/next
+mkdir -p $DEPLOY_DIR/app
+mkdir -p $DEPLOY_DIR/prev
+mkdir -p $DEPLOY_DIR/logs
 
 log "All set! Happy coding!"

@@ -13,12 +13,20 @@ if [ "$1" != "--slave" ]
     prompt DEPLOY_DIR --skip
     prompt GIT_CHECKOUT --skip
 fi
-
-[[ "$GIT_CHECKOUT" == "latest" ]] && export GIT_CHECKOUT=$(getLatestTag)
-
 ########################
 
 notify prepare start
+
+if [[ "$GIT_CHECKOUT" == "latest" ]]
+  then
+    export GIT_CHECKOUT=$(getLatestTag)
+    export CURRENT_CHECKOUT=$(getCurrentCheckout)
+    if [[ "$GIT_CHECKOUT" == "$CURRENT_CHECKOUT" ]]
+      then
+        notify deploy skipped
+        exit 1
+    fi
+fi
 
 cd $DEPLOY_DIR
 

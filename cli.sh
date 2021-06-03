@@ -37,13 +37,11 @@ case "$action" in
     $dir/start.sh --slave
     ;;
   deploy)
-    $dir/prepare.sh --slave
-    $dir/rollout.sh --slave
+    $dir/prepare.sh --slave && $dir/rollout.sh --slave && notify deploy done
     ;;
   rollback)
     $dir/rollback.sh --slave
     ;;
 esac
 
-notify deploy done
 exit 0
